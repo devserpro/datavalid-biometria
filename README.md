@@ -1,10 +1,10 @@
 # Datavalid - Pacote Biometria <span id="trialSpan"></span>
 
-Solução de análise de informações que garante autenticidade e confiabilidade aos dados em tempo real.
+Solução de validação de informações que garante autenticidade e confiabilidade aos dados em tempo real.
 
-A plataforma APIGOV (Plataforma que contempla todas as API's disponibilizadas e comercializadas pelo SERPRO) utiliza o protocolo Oauth2 - Client Credential Grant ([https://tools.ietf.org/html/rfc6749#section-4.4](https://tools.ietf.org/html/rfc6749#section-4.4)) para realizar a autenticação e autorização de acesso para consumo das API's contratadas, conforme figura abaixo:
+O DataValid é disponibilizado pela plataforma APIGOV (Plataforma que contempla todas as API's disponibilizadas e comercializadas pelo SERPRO) e utiliza o protocolo Oauth2 - Client Credential Grant ([https://tools.ietf.org/html/rfc6749#section-4.4](https://tools.ietf.org/html/rfc6749#section-4.4)) para realizar a autenticação e autorização de acesso para consumo das API's contratadas, conforme figura abaixo:
 
-<img title="Processo de autenticação e autorização APIS" src="https://raw.githubusercontent.com/devserpro/consulta-cpf/master/img/oauth.png" style="width=50%;" />
+<img title="Processo de autenticação e autorização APIS" src="https://raw.githubusercontent.com/devserpro/consulta-cpf/master/img/oauth.png" style="width=50%;" 
 
 ## Como fazer consultas ao Datavalid
 
@@ -89,9 +89,9 @@ No exemplo acima foram utilizados os seguintes parametros:
 
 **[HEADER] Authorization: Bearer <span class="bearer">c66a7de41c96f7008a0c397dc588b6d7</span>** - Informamos o token de acesso recebido
 
-**[POST] https://apigateway.serpro.gov.br/datavalid<span id="trialSpanUrl"></span>/<span id="trialSpanVersao"></span>/**: chamamos a url do Datavalid passando os parâmetros para verificação de autenticidade no -d."
+**[POST] https://apigateway.serpro.gov.br/datavalid/biometria/vbeta1/validate/pf-face**: chamamos a url do serviço de validação de PF com biometria de face do Datavalid passando como argumento -d, o corpo da requisiço REST."
 
-Exemplo de Resposta para Validação de Dados Básico PF (Pessoa Física):
+Exemplo de resposta para validação de dados de PF (Pessoa Física) com biometria de face
 
 ```json
 {
@@ -105,13 +105,60 @@ Exemplo de Resposta para Validação de Dados Básico PF (Pessoa Física):
 }
 ```
 
-Exemplo de Resposta para Validação de Dados Básico PJ (Pessoa Jurídica):
+Exemplo de resposta para validação de dados de PJ (Pessoa Jurídica):
 
 ```json
 {
-  "razao_social": false,
-  "razao_social_similaridade": 0.5454545454545454,
-  "nome_fantasia": true,
-  "nome_fantasia_similaridade": 1
+    "razao_social": false,
+    "razao_social_similaridade": 0.96,
+    "nome_fantasia": true,
+    "nome_fantasia_similaridade": 1,
+    "data_abertura": true,
+    "cnae_principal": {
+        "codigo": true,
+        "descricao": true,
+        "descricao_similaridade": 1
+    },
+    "natureza_juridica": {
+        "codigo": true,
+        "descricao": true,
+        "descricao_similaridade": 1
+    },
+    "endereco": {
+        "logradouro": false,
+        "logradouro_similaridade": 0.9130434782608696,
+        "numero": true,
+        "numero_similaridade": 1,
+        "complemento": false,
+        "complemento_similaridade": 0,
+        "bairro": true,
+        "bairro_similaridade": 1,
+        "cep": true,
+        "municipio": true,
+        "municipio_similaridade": 1,
+        "uf": true,
+        "uf_similaridade": 1
+    },
+    "situacao_cadastral": {
+        "codigo": true,
+        "data": true,
+        "motivo": false,
+        "motivo_similaridade": 0
+    },
+    "situacao_especial": true,
+    "situacao_especial_similaridade": 1,
+    "nome_orgao": true,
+    "nome_orgao_similaridade": 1,
+    "ente_federativo": true,
+    "ente_federativo_similaridade": 1,
+    "correio_eletronico": true,
+    "correio_eletronico_similaridade": 1,
+    "capital_social": true,
+    "porte": true,
+    "telefone": {
+        "ddd": true,
+        "numero": true
+    }
 }
 ```
+Nos links abaixo disponibilizamos exemplos de requisição aos metodos do Datavalid, com todos as informaçes válidos:
