@@ -137,4 +137,95 @@ Exemplo de resposta para validação de dados de PJ (Pessoa Jurídica):
     }
 }
 ```
-Nos links abaixo disponibilizamos exemplos de requisição aos metodos do Datavalid, com todos as informaçes válidos:
+Abaixo disponibilizamos body's de requisições que podem ser utilizados na demonstração dos metodos do Datavalid. Esses body's possuem dados fictícios e podem ser usados para simular cenários nos quais o Datavalid valida positivamente todos os dados enviados.
+
+
+**Validação de PF com Biometria Facial (validate/pf-face) :**
+```json
+
+{  
+   "key":{  
+      "cpf":"81845995104"
+   },
+   "answer":{  
+      "nome":"ADEMAR VEGA XIMENES",
+      "sexo":"M",
+      "data_nascimento":"1994-06-23",
+      "situacao_cpf":"cAncelada por obito sem EspOlio",
+      "filiacao":{  
+         "nome_mae":"MARIA VEGA XIMENES",
+         "nome_pai":"JOÃO VEGA XIMENES"
+      },
+      "endereco":{  
+         "logradouro":"Travessa Serrano",
+         "numero":"9754",
+         "complemento":"",
+         "cep":"12983406",
+         "bairro":"CENTRO",
+         "municipio":"Nova Iguaçu",
+         "uf":"AC"
+      },
+      "nacionalidade":0,
+      "documento":{  
+         "tipo":1,
+         "numero":"6694845",
+         "orgao_expedidor":"DIC",
+         "uf_expedidor":"MA"
+      },
+      "cnh":{  
+         "numero_registro":"98668270420",
+         "categoria":"A",
+         "data_primeira_habilitacao":"1980-11-28",
+         "data_validade":"2018-09-02"
+      },
+      "biometria_face":"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"
+   }
+}
+
+```
+
+**Validação de PJ (validate/pj) :**
+```json
+{
+   "key":{
+      "cnpj":"34238864000168"
+   },
+   "answer":{
+      "razao_social":"SERVICO DE E-COMERCE LTDA",
+      "nome_fantasia":"E-COMERCE",
+      "data_abertura":"1967-06-30",
+      "cnae_principal":{
+         "codigo":"6204000",
+         "descricao":"Consultoria em e-comerce"
+      },
+      "natureza_juridica":{
+         "codigo":"2011",
+         "descricao":"Empresa Privada"
+      },
+      "endereco":{
+         "logradouro":"ST DE GRANDE AREA NORTE",
+         "numero":"Q.601",
+         "complemento":"LOTE V",
+         "cep":"70836900",
+         "bairro":"ASA NORTE",
+         "municipio":"BRASILIA",
+         "uf":"DF"
+      },
+      "situacao_especial":"",
+      "situacao_cadastral":{
+         "codigo":2,
+         "data":"2004-05-22",
+         "motivo":""
+      },
+      "nome_orgao":"BRASILIA",
+      "ente_federativo":"BR",
+      "correio_eletronico":"",
+      "capital_social":0,
+      "porte":"05",
+      "telefone":{
+         "ddd":"61",
+         "numero":"4338456"
+      }
+   }
+}
+```
