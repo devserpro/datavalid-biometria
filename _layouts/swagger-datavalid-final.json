@@ -26,7 +26,7 @@
   "schemes": [
     "https"
   ],
-  "basePath": "/datavalid/biometria/vbeta1",
+  "basePath": "/datavalid-trial/biometria/vbeta1",
   "paths": {
     "/validate/pf-face": {
       "post": {
