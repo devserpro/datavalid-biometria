@@ -184,6 +184,14 @@ Abaixo disponibilizamos body's de requisições que podem ser utilizados na demo
 
 ```
 
+Para facilitar a simulaço de diversos cenários de validação de pessoas fisicas com biometria de face, disponibilizamos abaixo
+dados falsos que podem ser utilizados nesse ambiente de demonstração. 
+
+([Link para Github](https://github.com/devserpro/datavalid-biometria/blob/master/_layouts/DadosPessoasFisicasBiometria.csv))
+
+([Download direto do arquivo](https://rawgit.com/devserpro/datavalid-biometria/master/_layouts/DadosPessoasFisicasBiometria.csv)) 
+
+
 **Validação de PJ (validate/pj) :**
 ```json
 {
