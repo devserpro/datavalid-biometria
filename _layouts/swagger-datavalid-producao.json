@@ -1,0 +1,732 @@
+{
+  "host": "apigateway.serpro.gov.br",
+  "security": [
+    {
+      "Bearer": []
+    }
+  ],
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "swagger": "2.0",
+  "info": {
+    "description": "O serviço `Datavalid` é disponibilizado através do  `HTTP REST` oferecendo operações que permitem as aplicações realizar validações em dados de Pessoas Fisicas e Pessoas Juridicas.\n\n## Códigos de Retorno\n\n| Código de retorno | Resumido | Explicação |\n| ------------- |:--------------------|:-----------------------------------------------------------------------------|\n| 200           | OK                  | Tudo funcionou como esperado e a validação dos dados foi realizada com sucesso.                                               |\n| 400           | Requisição inválida | A requisição não foi aceita poís existe alguma iconsistência em algum campo da requisição. Confira se as propriedade do JSON da requisição estão de acordo com a propriedade esperadas pelos serviço. |\n| 401           | Não autorizado      | Problemas durante a autenticação. |\n| 422           | Validação não processada   | A validação não pode ser processada por alguma inconsistência na requisição.              |\n| 500           | Erro no servidor    | Ocorreu algum erro interno.      |\n| 503           |Serviço Indisponível     |  Algum serviço integrado ao DataValid está indisponível no momento.                         |\n\n\n\n \n\n## Tipos de Campos Retornados\n\n| Tipos de campos | Valor de retorno |\n| ---------------------- | :------------------------------------------------------------- |\n| campo de validação        | <code>false</code> se o dado for invalido e <code>true</code> se for válido                   |\n| campo de similaridade     | Valor de 0 a 1 que indica o percentual de similaridade entre dado a ser validado e o dado verdadeiro referente a chave enviada.|\n\n --------------------------",
+    "version": "vbeta1",
+    "title": "Datavalid - Biometria"
+  },
+  "tags": [
+    {
+      "name": "Plano Biometria"
+    }
+  ],
+  "schemes": [
+    "https"
+  ],
+  "basePath": "/datavalid/biometria/vbeta1",
+  "paths": {
+    "/validate/pf-face": {
+      "post": {
+        "tags": [
+          "Plano Biometria"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "payload",
+            "description": "Serviço que valida dados cadastrais de uma Pessoa Física, onde key é o número do CPF.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ValidateInputBasicoPF"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retorna validação de dados cadastrais de Pessoa Jurídica",
+            "schema": {
+              "$ref": "#/definitions/ValidateResultBasicoPF"
+            }
+          },
+          "422": {
+            "description": "A validação não pode ser processada por alguma inconsistência na requisição. As propriedades invalidas são listadas na resposta.",
+            "schema": {
+              "$ref": "#/definitions/UnprocessableEntity"
+            }
+          }
+        }
+      }
+    },
+    "/validate/pj": {
+      "post": {
+        "tags": [
+          "Plano Biometria"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "payload",
+            "description": "Serviço que valida dados cadastrais de uma Pessoa Jurídica, onde key é o número do CNPJ.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ValidateInputPJ"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retorna validação de dados cadastrais de Pessoa Jurídica",
+            "schema": {
+              "$ref": "#/definitions/ValidateResultPJ"
+            }
+          },
+          "422": {
+            "description": "A validação não pode ser processada por alguma inconsistência na requisição. As propriedades invalidas são listadas na resposta.",
+            "schema": {
+              "$ref": "#/definitions/UnprocessableEntity"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "ValidateInputPJ": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "$ref": "#/definitions/KeyPJ"
+        },
+        "answer": {
+          "$ref": "#/definitions/AnswerPJ"
+        }
+      }
+    },
+    "KeyPJ": {
+      "type": "object",
+      "properties": {
+        "cnpj": {
+          "type": "string",
+          "example": "34238864000168"
+        }
+      }
+    },
+    "AnswerPJ": {
+      "type": "object",
+      "properties": {
+        "razao_social": {
+          "type": "string",
+          "example": "Nome da empresa"
+        },
+        "nome_fantasia": {
+          "type": "string",
+          "example": "Nome Fantasia da Empresa"
+        },
+        "data_abertura": {
+          "type": "string",
+          "format": "yyyy-mm-dd",
+          "example": "2000-01-01"
+        },
+        "cnae_principal": {
+          "$ref": "#/definitions/AnswerPJProperty"
+        },
+        "natureza_juridica": {
+          "$ref": "#/definitions/AnswerPJProperty"
+        },
+        "endereco": {
+          "$ref": "#/definitions/AnswerPJEndereco"
+        },
+        "situacao_especial": {
+          "type": "string",
+          "example": ""
+        },
+        "situacao_cadastral": {
+          "$ref": "#/definitions/AnswerPJSituacaoCadastral"
+        },
+        "nome_orgao": {
+          "type": "string",
+          "example": "Nome do Orgão"
+        },
+        "ente_federativo": {
+          "type": "string",
+          "example": "BR"
+        },
+        "correio_eletronico": {
+          "type": "string",
+          "example": "empresa@dominio.com.br"
+        },
+        "capital_social": {
+          "type": "number",
+          "format": "double",
+          "example": 0
+        },
+        "porte": {
+          "type": "string",
+          "enum": [
+            "00",
+            "01",
+            "03",
+            "05"
+          ]
+        },
+        "telefone": {
+          "$ref": "#/definitions/AnswerPJTelefone"
+        }
+      }
+    },
+    "AnswerPJProperty": {
+      "type": "object",
+      "properties": {
+        "codigo": {
+          "type": "string",
+          "example": "01"
+        },
+        "descricao": {
+          "type": "string",
+          "example": "descricao"
+        }
+      }
+    },
+    "AnswerPJEndereco": {
+      "type": "object",
+      "properties": {
+        "logradouro": {
+          "type": "string",
+          "example": "Nome do Logradouro"
+        },
+        "numero": {
+          "type": "string",
+          "example": "0007"
+        },
+        "complemento": {
+          "type": "string",
+          "example": "APTO 2015"
+        },
+        "bairro": {
+          "type": "string",
+          "example": "Nome do Bairro"
+        },
+        "cep": {
+          "type": "string",
+          "example": "0000001"
+        },
+        "municipio": {
+          "type": "string",
+          "example": "Nome do Municipio"
+        },
+        "uf": {
+          "type": "string",
+          "example": "DF"
+        }
+      }
+    },
+    "AnswerPJSituacaoCadastral": {
+      "type": "object",
+      "properties": {
+        "codigo": {
+          "description": "2 - Ativo / 3 - suspensa / 4 - inapta / 8 - baixada",
+          "type": "integer",
+          "enum": [
+            2,
+            3,
+            4,
+            8
+          ]
+        },
+        "data": {
+          "type": "string",
+          "format": "yyyy-mm-dd",
+          "example": "2000-01-01"
+        },
+        "motivo": {
+          "type": "string",
+          "example": "Descrição do motivo"
+        }
+      }
+    },
+    "AnswerPJTelefone": {
+      "type": "object",
+      "properties": {
+        "ddd": {
+          "type": "string",
+          "example": "00"
+        },
+        "numero": {
+          "type": "string",
+          "example": "00000000"
+        }
+      }
+    },
+    "ValidateResultPJ": {
+      "type": "object",
+      "properties": {
+        "razao_social": {
+          "type": "boolean"
+        },
+        "razao_social_similaridade": {
+          "description": "Percentual de similaridade",
+          "type": "number",
+          "format": "double"
+        },
+        "nome_fantasia": {
+          "type": "boolean"
+        },
+        "nome_fantasia_similaridade": {
+          "description": "Percentual de similaridade",
+          "type": "number",
+          "format": "double"
+        },
+        "data_abertura": {
+          "type": "boolean"
+        },
+        "cnae_principal": {
+          "$ref": "#/definitions/ResultPJProperty"
+        },
+        "natureza_juridica": {
+          "$ref": "#/definitions/ResultPJProperty"
+        },
+        "endereco": {
+          "$ref": "#/definitions/ResultPJEndereco"
+        },
+        "situacao_especial": {
+          "type": "boolean"
+        },
+        "situacao_especial_similaridade": {
+          "description": "Percentual de similaridade",
+          "type": "number",
+          "format": "double"
+        },
+        "situacao_cadastral": {
+          "$ref": "#/definitions/ResultPJSituacaoCadastral"
+        },
+        "nome_orgao": {
+          "type": "boolean"
+        },
+        "nome_orgao_similaridade": {
+          "description": "Percentual de similaridade",
+          "type": "number",
+          "format": "double"
+        },
+        "ente_federativo": {
+          "type": "boolean"
+        },
+        "ente_similaridade": {
+          "description": "Percentual de similaridade",
+          "type": "number",
+          "format": "double"
+        },
+        "correio_eletronico": {
+          "type": "boolean"
+        },
+        "correio_eletronico_similaridade": {
+          "description": "Percentual de similaridade",
+          "type": "number",
+          "format": "double"
+        },
+        "capital_social": {
+          "type": "boolean"
+        },
+        "porte": {
+          "type": "boolean"
+        },
+        "telefone": {
+          "$ref": "#/definitions/ResultPJTelefone"
+        }
+      }
+    },
+    "ResultPJProperty": {
+      "type": "object",
+      "properties": {
+        "codigo": {
+          "type": "boolean"
+        },
+        "descricao": {
+          "type": "boolean"
+        },
+        "descricao_similaridade": {
+          "description": "Percentual de similaridade",
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "ResultPJEndereco": {
+      "type": "object",
+      "properties": {
+        "logradouro": {
+          "type": "boolean"
+        },
+        "logradouro_similaridade": {
+          "description": "Percentual de similaridade",
+          "type": "number",
+          "format": "double"
+        },
+        "numero": {
+          "type": "boolean"
+        },
+        "numero_similaridade": {
+          "description": "Percentual de similaridade",
+          "type": "number",
+          "format": "double"
+        },
+        "complemento": {
+          "type": "boolean"
+        },
+        "complemento_similaridade": {
+          "description": "Percentual de similaridade",
+          "type": "number",
+          "format": "double"
+        },
+        "bairro": {
+          "type": "boolean"
+        },
+        "bairro_similaridade": {
+          "description": "Percentual de similaridade",
+          "type": "number",
+          "format": "double"
+        },
+        "cep": {
+          "type": "boolean"
+        },
+        "municipio": {
+          "type": "boolean"
+        },
+        "municipio_similaridade": {
+          "description": "Percentual de similaridade",
+          "type": "number",
+          "format": "double"
+        },
+        "uf": {
+          "type": "boolean"
+        },
+        "uf__similaridade": {
+          "description": "Percentual de similaridade",
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "ResultPJSituacaoCadastral": {
+      "type": "object",
+      "properties": {
+        "codigo": {
+          "type": "boolean"
+        },
+        "data": {
+          "type": "boolean"
+        },
+        "motivo": {
+          "type": "boolean"
+        },
+        "motivo_similaridade": {
+          "description": "Percentual de similaridade",
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "ResultPJTelefone": {
+      "type": "object",
+      "properties": {
+        "ddd": {
+          "type": "boolean"
+        },
+        "numero": {
+          "type": "boolean"
+        }
+      }
+    },
+    "ValidateInputBasicoPF": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "$ref": "#/definitions/KeyPF"
+        },
+        "answer": {
+          "$ref": "#/definitions/AnswerBasicoPF"
+        }
+      }
+    },
+    "KeyPF": {
+      "type": "object",
+      "properties": {
+        "cpf": {
+          "type": "string",
+          "example": "05137518743"
+        }
+      }
+    },
+    "AnswerBasicoPF": {
+      "type": "object",
+      "properties": {
+        "nome": {
+          "type": "string",
+          "example": "João"
+        },
+        "sexo": {
+          "type": "string",
+          "enum": [
+            "F",
+            "M"
+          ]
+        },
+        "data_nascimento": {
+          "type": "string",
+          "format": "yyyy-mm-dd",
+          "example": "2000-10-10"
+        },
+        "situacao_cpf": {
+          "type": "string",
+          "enum": [
+            "regular",
+            "cancelada por encerramento de espolio",
+            "suspensa",
+            "cancelada por obito sem espolio",
+            "pendente de regularizacao",
+            "cancelada por multiplicidade",
+            "nula",
+            "cancelada de oficio"
+          ]
+        },
+        "filiacao": {
+          "$ref": "#/definitions/AnswerBasicoFiliacapPF"
+        },
+        "nacionalidade": {
+          "description": "1 – Brasileiro / 2 – Brasileiro naturalizado / 3 – Estrangeiro / 4 – Brasileiro Nascido no Exterior",
+          "type": "integer",
+          "enum": [
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        "endereco": {
+          "$ref": "#/definitions/AnswerPJEndereco"
+        },
+        "documento": {
+          "$ref": "#/definitions/AnswerBasicoDocumentoPF"
+        },
+        "cnh": {
+          "$ref": "#/definitions/AnswerBasicoCNHPF"
+        },
+        "biometria_face": {
+          "type": "string",
+          "description": "Foto da face da pessoa codificada com Base64",
+          "example": "/9j/4AAQSkZJRgABAQEA3ADcAAD/2wBDAAIBAQEBAQIBAQECAgICAgQDAgICAgUEBAMEBgUGBgYFBgYGBwkIBgcJBwYGCAsICQoKCgoKBggLDAsKDAkKCgr/2wBDAQICAgICAgUDAwUKBwYHCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgr/wAARCACtAI0DASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD72iQ54qxEmP4ajiQ56VYiiA6tzW0TxySOM4INXIB3HpzUMaZA5/CrEKk8VRMpFqCMMQT6VaijwMjj1qCAZGPapbi6tdOtXvb+6jhhhjZ5ZZmCqigZLEngAD1rMz5i5GwUf/WrmdQ/aE+B3hzxjZ/DzxJ8XPDOneIL66Nta6HqHiC2gvJZQm/YsDyCRjtKsMKcq6sMg5HwT/wVR/4Knw/AXSbv9nz4ifCqSy1bUrS4uJrCeTzrXUbKNJjBLZ39rcrJFI9wluu2e1DR/vGeN4wrP+I/j/4zfEX41eJV8UfEHxbqmrarMnlXusanq9zcTzlS7JveaVsBEOwKu1QiDC7ixbOW51UcK6kbvQ/rusby3baqzKxZQy4PUHvWpbsq8MenFfyH6J8YPih4N0W58H/D/wAceJLGxlmhu5LPQ9Ynht5p42DJMyRvtdlOMP8AeDRgjGMj1nQP+Cn37b+i6lD4stP2tPHWs/ZfMjuLLXvEFzqMM9sVyyz2t3JLBMj5YtGysjeW29SvzLPvGjwPaR/VTZkY4Na9jLtUe1fjn/wRt/4L1L8S/EFt+zD+1l4kga+Mgj8OeNtSvfKbUS8qKsU5kJRHAZ5MvKBtQopZ/Ljb9ftD1Oy1S0hv9NvI7iCeJZYZoXDK6EcMCOoPrQpXOeVOVKVpHQ213sK/5xV+2vN3ArEjYnmrlvJgjAqhXujXE4J4f86kSUupB7VnI5Azmpo5HQ7h/e9qBlzcADz9KAxYZqAyMQW75pS5J+Y4+veqSJkfJsa8gA1LGgLZB/KqqTbfmz36VPE4Y4NbBqXIBj5sZ71ZhXjNVI3wOfwqxDIo4xQSXoCScBa+Rv8AgsJ+0fpX7NfwIsfHtmhh8R6ffSXHhnVF1u8sX0++W3lEcifZlYTtiRlMMoMMiuyzL5bGvq/ULmeHSbiezuI4plt2MUk0e9EbbwSoZdwB5I3Lnpkda/B3/gvd+1xoPxD+Ltz8HfBnjDXtasfOW5vG1rZHDaMjMAlvbIqNGd+9DJcxi5KxgK727xVMrJF4en7SrY+H/jR8dfit8etesPFPxf8AiDqHiDUNN0m30uzvNSuDI0dpAu2KEHsFHPPJJLNliSebtPt91e2f9n2KtJDMCu6PaGPUAkdvoen4k+qfs6/s0X3xBli1fxBausMrAxxngBT3Nfcfwp/YI+Hd3p9u+jaMscjMomnLEYPf+XXv0r5rMuIsDlsuSV2/I+zwGRYrG0+dWivM/OSw8LeJ7/U3s9KsJIxIVjmhMITOWB2svIwW5HGBgDoAK0Lz4SeOtM26gNBu45Y/mZo4278qw9OeOvYDjv8As18FP+CZ3wi07VLdtZ8O215cXEm5pJIz6H0J9PUZ6e1fWHh39gf4D+ItBjz4EQLH+4t1kt1KEgqSwyOh3E4xx83QivIXGFOrP91DTzO+XDvs4+9PU/mb0uG60jW4luYpLc7uRLHwORjA6YBz+eK/o7/4N5P28fFf7Xf7K+o+APi340m1rxn8P9Qitri+vN73F3pkyH7LPNM5Jnl82K6jZslsRIXJZtzeBft6/wDBHX4FeP8ARr6PwBo66TrlrHI1tdWY+WWXBwrAcYzjoO3bGK+Hv+CR/wC0JrX/AATh/wCCgLaX8UNMmsVvtJufC19dy+X9nsZLi4iMV3PveMfZo3RJGO9SVyFOWFe1lOeYbNuaMVacd0/zXkeHnGT18HSTeqezP6araTcQvbtVuF8YNYPhrWjrGkWupTWrW7XEKyeTJjdHkZ2nBIyPY1sQyqR1r3D5S7juaUMmRU8ZwMtVC3mHrVmOTPzM1NFRd7ljc23IBp7FSdzrUQk3DcTxSiYfxH6Uytj5EhnJzz3qxDKQcg9KpRMNuRU8UnONv4VsHQ0IpxjHNW4pcr+lZsTY7VagcE9aCXuZXxi8XWXgv4Ua/wCJNQvRbx2ulylZvtJhKsV2rhxHKwYsQBsilckgLHIxCH+WjxRra/Fr4/at4t1V4mi1jxBNdMsN3c3CCN5WYKJbtmuJQFwN87NM/Vyzlif6cP2ufBS/EX9mTxv4Nn1WSzjvvDd0k1wsXmYj8sl1KFlV1ZQVKuTGwJV1dCyN/Ml4G8IXN58WH0Oyljljtr6QXNxbrKkYiRzllEwWQA44DgPgjcAc1z4iXLTbv0PQy2PNJpb3R9q/AsaLYNZaehCq8YVEjXJ9j/npX2v8FfD8cmlK0RuPlYOy8HgAkjAxnp7+hz0r82LD9q34e/B+WODTtKk1jUopGFxJbyhYoO2ASCCw9RkfXivT/hV/wVw1iwu4bCX4Yb7eSTaR/aI3LyMnOzoefz78k/lObcP5pjqntKUbLzdr/I/UMLnGApWpuWvkfq/4FtLmM+ZBHJxk+YXKmLA6cEcZ6cg8Hr0r1LwbrWoWsmbTUr+OQkxjbO2GXJ7Dvt9s5DYPIr49+EX7dXhbxDoOn6jJeQx/bMgwXA+ZAU+4DgdMDk59fppa9/wU/wDhv8BIJIfE7XFxHGG+eGPzXCblG0gEZBOMY6Z55Jz4VDL8bGSgr37Hr1ZU40+eWx9PeMrqO7nkWeaSSR2Y/v8Ar9PX/PGa/Iv/AILZ/ALS9O+J+l/GfRNHaN7218vUPLTmQrxg4B52kj649AK+vtA/4LLfsn/EzVfsv9t3lvJcSGJfMsWjVGwBksTwPxOO+M5rxz/grRc2fj39nXS/HXhzW4dQ0+PWEjlurWUECOVCMsQcqQRtI7EjIr28nw+Ny7OqftIuN3b1T0PEzPEYbGZbOMHeyv8Acfof/wAEbv2t5v2t/wBjbRfGWt69qGoa7ou3Rdbu9SnaSW4kgXEc7OxBkd4yjSSFELS+YPmChj9gWdwWVeK/Ov8A4N4pEh/YhubL7Pa/6H4rubf7Rb27RtLiONv3vaRgXOJMAlCincU3t+g1hcHCj+tfqUN9D8nrWjUdjahmOMirUUvy7ie+KzYpM9TVqGQ4+8K2M4tGgsoK7s0FgT8wqum4rgrmnCQj+GgrqfJcYbd0qaNsD8aZECUzn2apY0xyRXQGxYjYtyVqzbkg8VUXI6VNEx7k9KCR3iLQNM8W+Gr/AML6/ZLc2OpWUtreWzMVEsUiFHQkcjIJGQa/me+Gnw41jwL8XPiN8M/EdlJBqegNeafdQXChWjkiuTE4PJwc8dT7E9a/eb/go/8AtaeM/wBlD4AR+KvhlpMN54g1vWotI0v7QuUtmkjkczHIKkqI+AwIyclWAKn8hvELeP8A4wftI+Nfir8U72BvEHiLS9ObVLy3gjjR35hLBY1C5K2q5+VctkkDNeZj8RThTlHqtT6DJ8vxUoqvb3G7eZ856rrmj+BdQXR7Tw5DNKw4VtvzHH+0cAE+pBJ6Z5rN0v4kXjXiahpOj2EcOVE0NnuBjz0BEirk9eEyDgnPevv/AMEf8E/PDPjG0GsPr9yrOqmR1x0I/wBofNz+FdDcf8E4vhd4I0m417XdQmuDCrPE0wUA+2EUcfh39q+SnxZlcYtTTb+Z9tT4fx0ZxdOaiu1l+ZwH7EHwE+LX7RWrTaV4RvI7f7Hal5GuZMLnaSE/HafwxXHftft4l+Dmpf8ACOeKfBM2panLObWG3mQmNmHHXHTg/l+NfoB/wS88Nw6Vrl5rOniL7O0ckcMNsn7tSIyox69OvT3r1z4zfsqfAz9pU3Oj/Evwmsyrz50fyyp2Pf8A2f65r5uhntOOYN1I3jfZbrRdT6apha0sG4RfvW3auj8IPBXjn4b3891c654JurXyRG091p8ySRxtJtKhgpITqPvEAEFSQeK+nPAx1XXv2S/iN4d8PX0upaDH4cjvLcyR7XgkjuYCvBAIIG4YI45JPJz+hPgf/gjh8ANAm26bbjU7GT96ttc6DZFgvpuESv04z97jrVz9on9lv4W/An9lj4geGPh14JstPt/+EL1IslpCFJdbaR1HGf4gMfSvercQYOvWp06cHut9Utdz52eUYijhZzqSTdnsrff3PYv+CJfgq48D/wDBOjwCdQ0v7Ld6xHeancD94N6zXUpifD9AYhGRj5SPmHWvsDT5OfvV88/sKan4n/4V9eeCNR8Mro+i+FZrXSfDFmxJm+xR2UG0zc4Dkk8ADAwPm+830FYOMdK+wwddYmmqsU1fo/8AgaH5nmGFqYTFToyabXbbVJ/qbUUpKDJ5zViGXBwB161Rgl+QfzqxAz45P6V6B56WppI+4fNTwxJyDiqkcmFxmpDM38Of++aoLHy3F6Y69qmxjnFRquOc4p0siouSRWgPsSCQRgsaq3WprD0btiquo6kqKxD1zOu+IRbI37zt+VVGLk7A2ef/ALanwotv2ifgpfeAY76O31K3mS/0O6m3bYruMMAGAYZV0eSMk5CiTdtYqBX5T6homoeE725XWdPlg1SO8+y6lHK3zRSRSP8AIeeCPMI/pX6m+LvGjPKyJL09+tfH37fnw8Op6L/wtfSLZN8Plx6pswpYZCxyH+8eQhOScbAOBxw5tlrqYd147pa+n/APpuH81dGSwk/hbuvJ/wDB/P1L37Onxa0hdEtrOXUUklVd8wZTxjoDwe/T3GeM1V/aq/aK0B/Cy2FzNNDpdxdC3vJ0m271wWKZ67cDBIOQSMYNfIejfEXVfDczCO98uMyLnDFVTJHJ55455z0+mF+K3xKl+Ktra+HtMtGaCz3JFCXyGPck88kDP41+XwyKM8cpfZvdvsfqX9pU6NFP7TWx9ZfsPf8ABSL4bfDubydO+wrNY3ylIR+8t5PnHBA+YZXjb6Cvq3wf+1/8L/2iJ9Qk+AvjbTpvFWlzsLvQYbgPkAFniOCcFSpwSflIwe9flj8HvgR8TPHGo28ei/Dy6uuAI547fdgZ5GVI5HJGTxgmvvz9lf4d+AP2TIZdRm8Py2+s3tqIrrUJ7dVVsnd5RZeAMjdwcngkcVtmOVZXR5lTl771STT9bio5pUlZzjb5fd1Ppb4VftRaT4tD2zFLW+hjK3Fm3ySRSjO5SPUZPHXvzkmtTx3pdr8UtNuvBD3nlw6pbvbX0xw3lxujB8/7qFmwe2PXFfGfxN8bT3nxbfxv4Au44ZLhS11DCx2TFDyc/wAJHB9+D2r6E/Y/1Hxd8U/GFvp2rWvnRQwvJenzQRHGVCE84B+/jC9yOAMkebhcHUqVlFfF+IswxVCnhfbJ+7ufXnwW8OR+HPCMW26knkvmFxNcS4LSsUVQxPfKop9unGK9AsWJ4NYumxRxKiqOBwvoK2LInjiv1LB0I4ejGnHZJI/F8ZXlisROrLeTb/4Hy2NW3Y7OG/PvVmHLGqMBITgf/XqzESo2mvQRwouo3bNSiQ44qoj8/hUokPdqoR8zswRcH9aztTvyh4P5U69viBgVz+taqI1Yl8VtFDaIdZ1jYrOW6e9ee+NPFGxWVX+Yj1rR8Ta8EZiZPfrXlnizxEbm7dC5KniuujAiRBqGqyXM2/diuU+MfhIfEH4Xa54Tji8ya709/sse8LmZfnjGT0+dV5rQmvdp4ft+dVNQ8R2WnWUl7f3yQW8MbSTTTOFWNQMliTwAAMkn0rvlGFSm4PZqw6dSVOSkt00/mfmhcQWS6hcaXqkLeXKrLn+JWHQ/561gy+A10aaO50PxZf2jPtabDgg84GAx4PX0znvmtr42eL9C8TePb3xp4YuPM0fWL6W+0ubyTGJLeV96MFZQV+VgdpAIHUDpTvCUP/CUldKDrtmz8zsMD0PPtX5TUcsPNyT0vqfrmHrU63Lde9ZHs3wK+HWnatbQ3mgftxf8I7cMqreWs2hMzjJGANtwmcEDtxk896+kPBP7P3jLxfPN4Rb9ubVdU0CSzxcXFroENtPnHITfPOOuQGwfXtivm34Tf8E828f30OtXOu29tDJ/qzbD5mXrj68jj3r7O8B/s9eCv2cfDMeneGNVuJppY1VpZ5NzZ7kjngenQ8+1eJjswwvK/ZS5pP8AurT5n0TxP7vknBR+d/wt+p5r4H+Cdl8HvGuoeEbHxpqusWMYSWzub+RTKjH7x4HJ+b0x1+g+9v8Agn98Pl0PwnqHjCSMFbpltbKZoyrMifM7DI5ViUHfmMjtXxLrvi+CTxNHoWnFpdSvrpY4YYHO+bvuOAMKMDOeMZ7Zz9efsK/tdfDzX/HXib9jjUtVgtfE3gW6tU01PJaNdVtJ7CG7aRWJKtMsr3W6MYIjjDAEByvXw7RqVsa6lTVqLf5K/wCJ8XxJiHHL1CGzaT/P9D60s8Flwa1LQ8CsexfG0Mc+9a1u3AIr7ymfnctjSjbauN36VPFIHXBqgsu5SpqxHKSvWuhGWxeEmByafvI5FU45j1p7TEfxfnVpcw+p8nalegBie1cp4h1hVR2q9rephUbEtcP4m1chG/xrWPYGc/4z8QeV5m1znFeY6nrivcMfM/WtnxvrpzIBJ/8AXr58+P8A+1T8LvgJYPdeNdckkvGj8y30nT0El3KmcbgpYBV+98zlVO0gEnivQp2jG7M/enLlirnqd3rxx/rK+OP+Cl/7Y9ro3ga6+B3w91uGS/1aN4vEF9a3RLWkSkhrYFGGJHK7XDHiMspUlxjwn4/f8FB/i98Y7O40HSSvhzRZl2y6dp1xIZ54nQcST/u2dfvZVBGpDbW3ZFeB6uLifQOIWXrvw2No4xnAGR2wRxwR78tbF80XGH3noYfBSjJSqfcfRA8MG8+HGj6NcMvm2mlwReYvZ0jCnt93I/ya5Sz8Xa94Tu/sk7GNo5M4I/r3rf8AgH4g1DxR4U/sjXnH2y3jjlYk9Y5kEqH6bXA/CtTxb4Dt79M6nablVvlkj6gflXwVOp9Xqyo11dXP0H2axVGNXDys7L5/8Mdh4I/bn8WeEdNtdOtLiR5Ldg7TrcHqcHgEZ44GDkdenQeux/8ABQjUda8MqbKydr4xbYYWY7d3y4xx2x74JPSvmLwr8G9Bv9QK3GrMqryBu25/A89K9q+C3wV8O/8ACRW8cFvJeRxsA25dqt04Pfv7Y4xXPiMPk1O9VR2Oml/atZKNRpLv1PqD9gP4da/4r8Qf8Li8c+azRqVtI2fAiyuQBznJGCeM49N2T4j8TPEni3wN/wAFN/idPoWp3kckNvpes289op3Rk6ZZTxTBkkRYjCsrETMX8oAsI3bCn72/ZD+Gup/E3xh4f+C+hRNbTavL5RMbCP7PbIjSTSAnIG2NXIJXBOBgkgH88f2m/in4f8T/APBUf4uXvgkQra3Oqf2Dpq20YFvtsYre08kR7csji0MWxFLssm2NWZlU+dwdmmIrccKi4P2bpTd7e6rTpJRv3tJu3bV7o4eI406eXqmndpr12ep+sP7Mn/BUf4KePrDTfCHxi1eTwn4mMYhlutagWHT7+ZRIWkScMUgyI87ZjHlnCJ5hr6x03XLS8to7m2uUkjkUNHJGwZWB6EEdq/nlGqaofDZ1vw7aQtpqvHcTSQ2kLm2fdJHDc/utqj5Cis0RQedDMuVfLV6V8CP2vv2n/wBkm6kg8H+Or2CzhvXXUtBvGkvtO3LNE07xeYo5dWwB+6dGKISxniz+vYnKIc3NRla/R7HwDp3P3kguEYcGrEU2BgnbnvXwH+zj/wAFo/h34tNtof7QHhGTwrdzu6Q6lYsbi1kKSbHJQFnRUJVCymQFt2DgV9p+AviT4O+I+gR+KfAniux1bT5mxHeafdLLGTgEqSp4YZ5U4I74ryalGvh3apG3n0MHTOxVwB1qRX3fxVlw3ZP8X0q0l7s+6PrRGa6E2lE+JdfvNkZrx/48fG74bfBzQm1v4jeMbTSoX4hSaX97cNuUERxjLyEFlyFBxkZxXJ/t2ftu6b+zdDD4N8N6cl94r1LT3vLZbyOQWllbBzH9olZfvfMrAICD8pLFfl3/AJcfGn4oeKPiT4gu/HHj7XtQ1S6fV5kjvr62EkpJAKWUaLtjL5bc0WzbApjBBYmIdkItLmOinh/aO70R7X+0/wD8FHPFfiR77Q/hdAPDOneSH/t27kimupo2I5jjViqcb1zuPz7V3o/FfGPjDVNbvnuJvEUctxrV1I880V7IzSDd8xludxJDf7LHeSTnO7B6jUNPnsdSuooEto9Shh869ka4EkekgcF3YEma8LEkgE7GYqACCseTZeF7FtMmm1UNaWNxayXNo13vR7oA7ftM7KR8pfIRAxBIwvmOMSZVJSmd1OnTpfCjhdb0q8sIoZJ5JJJtqtI2Pm3n5slch0wCB0wdowT2U3WdFmhW2YeYqoG3dWLr8uO3Q9hzzx0rpvGn/CLCJ7bTdVsGmVl2wm8t5Vj3AswU7Gh+9n7kiqc8Imdq4Nxo91AksFuzTRw26O0loY5EC7+GZld1VQcfxDJOABuJrCUeU3ue6/DPw/qXh74P+CPjZEGkhuIZtM1jd08lLuWKB/vfwbQnAyQ47LXsOiWFtrv+j27qyzr8vyjbzj/P+Nct+xt8I/G3xx/Y4voNLgm1OLR/E15YrpsahsQGCCcgAf7c0h98nGcYrK/Z88bX3h74uW/wF8bX+Lx7oQaPeXEg/fMQGjiY4A3spAB6FuASSM+XmuTSoYFY9VVNtvmiviitWrrdq19bW0t0M+F+IaVbNK+WTXK4S0vs07bfNr7z06D4aLb6hsi0lWZeRhsV7z8AvAGrXWox7NM+yRR4Jk2jfx2G7/A/WvUvht+zXNfWS3bWjbsBmHTHHfPXFbXxJ8e+Ef2T/Cj+MvFPh241WeSeO10fRdPj33F/cSSJGiBeSEDuu5uSAQAGZlRvzPG5nLFVPq2CjzTk7JeZ+lOrToUnOq7JK7Z7l8HfiRY/8E+/2M/jF/wUF8SRQnU7Xw/NoXglb4zKsl4zKI40CPidJb026vlA0S2UhDbXfb+C/wAMtTNz8Q7e617Xdkl9JI0l7eCOZTNIpIaTzWEb5dlDCRghywkIXdX7mf8ABc39lxvCf/BLPULrxhexTTeE9H0n+xbOHdbwG+OqWgu9RSMtt3ypd3HJLMfMYZJxX4J+G3lsNYtdTFjPcR29ws0kcTbXfawOFYqwDHGBlSMkZB7/AKZkvDdThuMXUmpymoy0W1vije15e/zO+1ml0PyfL+IZcSe3ruDio1JRSe/LZOLt0vGS073fU+pvDvi3VdLvbWKeJnZle0urG9jlRmhmgwkUgmzMrMixFOZX3RKIjdhUt4tC40XT7+1TxNb6ldR3sOnW/nNGHkUxwOYFZ44wGZgJYQrxP50e27HzOrwnw5PjX440ZIdJb4GaxNNJa3E/h+OG6VoGtSshkAhWBgRgusqQNFE20+ZE4BWtLS/2t7LSoba/1v4beImtY44btjcvHMrRorQCMsUXcN52efwYlLRwpECSfuY4qjy2k/wZvyS7HqP9omKCS4eaCZZrWOSPbGHxAmGjmOweW8KtEB5yIwCxrGwtFyG9E+Bfx/8Aix8AvE6+JfhX8QNR0eSO2AS1s7xJI5I8lt8kYHlThjsXdsMDMVSMuVwPKYfFdl4mu5LvQbW58wzm+1DSLeH7PeRb4kkXU7BFO3ds4mRSwkEW9lYFWiswzx21lBFZv56Xkklxbx6fD5dvqUQX57qx3/Lb3HH7+14WThSvAFac0Zb63J5VbU/Z/wDYZ/4KV+Df2j7b/hCfiTc6doXjCK4EUUMchS21Ldjb5O8krJlgvlliWOGQkEqv1ZHdoR82a/nd8B+ILzS9Tt7rTr+FUeOOW2u7eORYpYlfYjx4AaMq/wC5KEMY3CouY3jEP7FfsG/tw+Hv2jfhDv8AGniSzg8UeH2jtNe8wiFLgsu6K4U4CnzFGWCnAcNwFK14eY4BUY+1pLTqu3/AMZQsfgX8XPid49+OPjDUfibrv2u31HWtdt4Zpf7QLQ21xM8iQeWhcsiottdbVYkoYYyCMkV5/LrGn/8AE+8c6Yjw/wBgtDYeGbcxq4tA7viTP9/CyPv6mRy1TN4p/syw1AW+nPGttr+l6nGsjBdsUEl3AwdAeH8yc5OCM7s4J5ks/Db6N4n8afDO/uEax8uR5rxk+48Tlo2BGcZLEenNOTR6CXKrIbHpuk+G/E/gTwjq11bTaRe2NtqmoTyDEVzc3BkIEvUMIjsi56BGOPnYHl5PCGu+LNc8ReF/FNzdJ4sFwGjsrqdVe5nVj5ilmO0yY+6oOWzhckgVoR6ZZ6l+z/Ne6irNJo+uQ22js0jKY4pQ8k0a+oL/ADc5AzxjPMnxL067vvhr4b8b6ysjaneTSRNfzMfOuI1+47P1dhwA5y2ABnAFS482gHI2ngPRPE/huPRfDGmMviCzkk/tDTbiUrNdYPWJSRuZehjHzkg/KQKjTw54R8TeHrfSLS4h03xBZ/u5LW9Xyxcr22vjHmZz8rFc8AZJwOt+Jukv4g8A+H/iG7NcXskbQ6leIvzFlbbFu2/xbVOCeTjmrFr4Sh/aB8F3et6XKV8TeH7Pz9SMi4W7t1yfM3f3/vsSeyqO9YSggufR3/BEfRtK8QeNPiJ8CfG+p6hY3WpWOn30enrHtVoYZnSWUOQQjB5rfDKA4yGRlZAR1f8AwWm/ZY+G37OHij4c/EzwDfR6bHrulz6fbaLbxvssRpyI6ypOZGfzXN3GoLAgGIsxOTjzP/gil8QPE9t/wUH8OeBprW3vYPFfhvVNKmubpWaW3iit21ANGwIy3mWUY+bPylh6EfoR/wAFsvgs/jL9glta1q88jSfCHi+w1i6lguFFw8ZMlgFVeWAMl9GSGABCswJ24rejhKM717e/bleu8U+ZK210+tr9L2PzXMMXiMs46ox19nVab8nKPs7/AHpfPzZ0X/BK39sPwf8AtT/CCDTPF+o2dv4u0xobCfzNsP8AbUn2bzGnhTAG7MdxuiXJVYhIQqSKB4N428cXn7Xv/BVrwL4X8M+LbbT/AAroeueXpLSTpKt/HpzWGsyXNuIZmUm52RGObgeUinaWQgfnd8N/HsXhDxHp7eDrvxdeQ6Pdf2g1vNrTtarBEQcGBIsgvkJv3qFLDJAya+3f+CIPgPXB+1vrvxl+K/h3SrPw54Z+F97eWGqafdRagun3CLaQCR3t3lfzXtftoEQGSC4VTgY+by3hrKcjzermzbUUm0rNqHWbVrt6LRJXs2lc/ROJ86xdXhmtRj8XK0n3bXLH8Wj7U/4LjfFNbD9mm1tdW0C98QyeKtY0fRIdLhmA89orqO88pnbcEVoLSZMhH2kD5Dk4/IzwV8L/ABJ4Z/a6t/D3jPUdPmvbO6ub/WLPS7eKK3gk8t5ngCJGsYVR8u2NEUdFAGAP0k/4K0/GTRfCOq/Bjwz4lmhm0fXPEEuux6pJG4EPk2cawfKwUgNHqJJyAQQuPb89b/WZfg1+2pqWteMI/OsdQ1a5ia5370ezuVMXnBj95QrHk8ECvv6lahmFOjVi+aKiuV909U/uZ8L4fYXEYXIZOqmpTqTbvvdNQd//AAEz/hxqwPhv4d65PetbppfjoWsN0zHatu7wyOrHOe5+XjgtxzmtDR/Dmq6JcXHhy38OW+qat4bXUNN8R+FLxtrXmnNKZfNgbqxQlnBXJQrG4DDIqPw/4Oi03V/E37MXiu9W3mvbz7f4TvpJtsct0P8AU7j/AHZISRnpuK9ehZqN/rXibwrH4zEXleOvh7cRrrMLzASXdmkmFl2nG4xsAGPcMPxb8j7g09Nn059M01YtYuJNHvmaHwnrV8ytd+HdRRlb7PLIMHymy/yHClWEgClWzYubvWNS0+a1stO/s+6uGuJ1s0mG3TdesSjzy26cCISwvHkAHJOATsUCjqxsDLr2l6M0c+keLNB/4SLR42biDUINzOR02lds6e4YcDg1BqfjXWYxd+MLgNJ/Zmr6f4kjtBgK63Vukd3wc5DMsCn/AHTnsKaA6nQtR07Uby11HQbiNtP8SXm6GONtr2F9Lbm3uoQA2B87QTDoAEjIGAK77wT8T/Ot5Gi1Ky0uK4jju7a3hkMaQxSbtsCqBjCbS2cAkynPTA8d0i40bwPf6hqVjqZm06z8nW9HjbK70njltz6fMkpjTIB/1ecjGKtahPa6Jr15LdQ2skd5K08MU2qC3EEbySNGmT98+S0J4HAK9ya0pySJlHmPBYo721t9PsL66jjTWrSS0t/tQb/UPI2M54Ux3CFssxZlmjwSuME3jPVduv6e8Uovtc0+ODVIWh8uW3uINruSOdySCJ34xhjgj5Ru5yG70UWzF9QW4/08Ld6XCoUSRtF8ksTKuxpAXddp5B2YLjcVux+ME0i9sdVtbp9bhtd8NnHqFu0c4hZJIzFKVLZ2/eUBmCh+MHIHzSkzqOg8O3WjeP8A4faf8MbPV1tdct9RmlsvtBCx3TSEYDMxADDoPUZ54AM/w2t5/E+nax8I/iIzafa6Zp93epqEilWsJYU4j+bAAZtkYA5JfAySKn0/R9L0DxxY+KdN8Kw6Xdaf4atNWhsTO8kUt3KqyQsWc8Iyukp5wAG52im6nf2fw68JxI9r9uk1bF0iTRsy3/J23Ey8boVZWMUL8SY82RdjLEdluA34Y+FPFDeBdS8GWejT32peLYUj0vR1bLQx5+e8bkiNQMqGfC4LHgDNU9R13SvhX4Yvvh94G1VbnUNSCx+JNWs2PlzRryLWIkcoCfmcff6YAAz337NHiiKPwx4u8T+MYJY4P7MkbUNXlk/fXk3ybbYMfmYsGJ2g87c8cGvL/DPg2fx74xj0Lw/bPK13dBQqKf3SFlG44Gcck/TPpWkYX1A7j9kTSr74d/Fjwd+0/quq/wBj6L4S8e6S99qEkb4W3a5iEmQuC6+UZtygjK7h3OP24/4KAfArxf8AHr9lzxdpU2lSalfW/gS4hsdJ06xSNtRvobG3VJZFiVfPmkm0+ybL7sG3hUfLGij8SP2lNai0rw/afBTQ3WKz0mENfrG2DPclQ2Wx/dLMK/d39kn9oLXfjT8EPBXjHxRZrHqHiLwnp2qYt8lFa4tY5jHk88byAT1C889erD+5zNtJbtvSy2Z+T+JEZUcRhMTGUk72sm9XFqUb287n4R/CzwVb+A/F2nT61f2NxJeWMY1nT1m4itb2TyRGT91nAXzcduhAK1+if/BG79kL4heGPAvxbutX8USWdhq2u2eixw6XcPHLL9jgmkkcuMHymW+VQAcNtbI4Ffn98evB198OPid8VvD11rDXVx4V8dW+kRzbQnnxwzaiokC5+UN5KHAJxux3r9eP+CJei+JPE/7D9n8UobG4/wCJ5JeX3iC+uvMaJruB5beNV4PlhoLIYHC7gCSC4z0UacHHkmk0k7pq6d9LNddz0+PsR7Xh6MKbf76UEmnZ2S573W3w7nyB/wAFVfAHin4oePdE+EMfja81nWvBPhmSWwtbzUDcNMtxcyMSwbJWTatvGF5PlxIeflr5Y+HVzYfHzQofgx4pv7ex8Q6cvl+G9Svm2+aeQtm5PIJOAmehfPtXaf8ABSb41m2/4KTePfiJ8Mtalhay1W1s1mWJkH2i0soLW5TDLkhZopVyAQ23cpIINcl8UNPtvjJ4Sj+NngjSDa6tbsx1yDT02853eaoBynU9MYCHGKIwo0UqdOKjFaJJWSS0SSWiS6JaI+g4Zw08JkGGpzk2+RNt6tt6u73bu9W9X1FtLPVviPp8Pwo8XzNpfjrww7x6IbttpvlQlvsxc4AfP3G+7gADkjOhJrE2rzWnx2t4m/tbTZv7P+IektHtkkt3AjM5XoVlDMjYGVYAnqKg0V4P2lvDMccV6sPxC0eFGsZJG2/2osfGzIAxIBt25ySVJPXifTNc1PxCG+MdhZLJrOiMLTxxoX8d5Zv8jz4OMlgGD45U4bjrWh7oJYQ+Epjp85kkh8O6g7o0Z66LqEYUSgDjCF156ZkHXNBtbnStSt7LWX3NHp7eHdUjZSIzDMjmyuVY4GCCRzjmJT/FWhGlzp7W+k6QY9SVrF5/DEkynbq+mNkT6a4/ikQnKk8gq2P4arx6Za+J/CMmmaVfyXOl3UclpodxNGxuFjLK62znOB5F3HAmOeL7j5W4H2A5PVml0JtD8OeNYrpLXTobrS7pYY8uY4LuO9GB3B83r6Nn3rWk8QeGF1G9tLO9iVlvJHkubhfOLrnYkKZSQ+XEkYjDYUMwfbuUKah1PU7nWLDQ/EOqam0eoQWN09/NFCGa3mdU0+NCpIG4+QjbTgHf6c1wVn4ssRrmpSTajDMqtDEsl1M0anEKsQuwbQAX27FG1AqgM4w1YTqOEl5/5FxXMeQf285uo7RjDtt4AqyRWoUykOTvbkMHwR84+YKo4IFegeAV8S6vb3GtXPi23uLPVIbq2uo7qY+cJUjCrvXHzyBCsgKnEnltzvBA838W67JqusW+o/2dZ2zQwrGsdrarGvygLnA7nqT1ySc5rV8Nx6l4m1KTSp9XlhgtVYwQwqFRXVcq20YBOR355PIzmvCi9bM2PQL3xU3xK8PTaRoOoTaXNp9mp1J7uFFFxbW8cdvbRgr1ZVAQAg53DJLbnfa8LaNrXiuXS/gdqOvi41zUryNdQvNQkMn9mxjGLcAjJlXOSu4/MdmQ27GRe+N9c0jXvCviPW7yXWLm+WK5uJdQk3OwinlhjjLYyQrI7jthkUgiNTXSfs5+F9Nt/wBp24t73dcrob6hc27O2GeS3VnjJP8AvqpP0rpi1uSR/tF3lj4W15Pg/wCEQ0Oj6H8kcR2lp5z96Z27sSueeAMAcAV6J8CtF8O/Ab4Qat8cPFMKrqEto9ppcEnJaaSPg9uhmBP0r55n1e58XeMRq2sO0k2pXj3U7M2fmYs56/5/lXr/AO1DNc2djo/g6GVVt4YYXTy1xhj5iE456hV/75reMrx0GeOazq9/4i1C41nU5PMuLmQvNIB/EcnB/EnH0NfsN/wRz8SeHvHf7BfgFdQ1vVrrWPAvjAmT7PePH5E1re3EiWz7wVZWs7mBAQCVjkKggFgfyk+H/wAONP8AF2pQ6ff3jKslnI77Y/7jKBjn1fPfpX6Y/wDBDYrZfDL4qfC2KGP7Poeqaf4gtrwKfNeS/hmt5IW55VV02NlPBBkf2FTispwOc0XgsWm6c7XSbT0kpLVNNardNO2zR8L4gSxmFyH67hXy1KMlJNpPRpwejunpLqj5D/4K+n+w/wBsXxZo8PhOPSbfUrHStREscexdRfZOJLvGfmLStIrMT9+NulfqN+zdqnxC+FH7JXw7+FOpTzWLaL4U01dT0iPCr9tFrbLMH2Y3/vIF4JIDAkckk/nF/wAFcfCs/wARv22/AunX+sPCvirQ9M035YQ32OOTULhMqMjcR5xPOMke/H6H/tb+KbrwZJqlnp6MTd5jjk3hfJaVR8+Mc7S3Tj9a+kwtGMcVVjbb/hz8s4kzLEZhwtk0YSadRWb7tcsF9+rZ+Vf7denJ4s8cX3xlTR1sbzXryS9voo2LCOWRA7qM9s7yOf5V5h8D/jFq/wAKvFkN4iedZyAw39m33ZYXyrjkYyULfjivcf2gkbWPDclpdtmMW1s8a44X/RyPXnk5z/8Arr5jvLP7DGtzBJtb7/yjpxn/AD/WvJjU5pXP6Dp0406cYR2SSXoeyfFfwHpfhiey+M/wplK2NxIJhJb7lNvJnBGRyOS3PTkDite48RXsJ0/9o3wuVby7hbTxVY2+eWcHd5i/3JV3jvgjp0xkfssfFTU9J15vAmsaXbato+qW8kdxZ3i5xhQ24Hs3y9cdzWxp9jYfDb9oG6+HFha/aND168axurCRiFCvuVWz3KMwYe6it4vuUNubOxivIfDllqvk6Dr0zX/hXURKVGmXw2hkBHROQrL7I3bmSO/tbzT5ZtQtfsc2oXUK3RkUrDZXZaW0unRR93ErWVweOCIx0rnfDcL3GheM/hPeTvJY6K1xqmlys3zW9xB8mV9AythgCM4FdBeRya54dgu7yQeXc6bZ3siBPmLTRxtKC3fcdOUjjgzMcHGClLUb2Dxvq8l3pN5rjwKsd+pur63tQA1tdACIynt8sts8np8+cck14v4NuPEkeixz/ZGuLibMt5C168MiyMxbewyoO5WXBy3Cduldx8Sb698L+E9TurS4Mk32LyppJP4xLqd0jkehwePQ+tcBc6nPeaZZ30aq0MysyW14zzeUwOCVbcDzgZznpXDiZR5lYuns2f/Z"   }
+      }
+    },
+    "AnswerBasicoFiliacapPF": {
+      "type": "object",
+      "properties": {
+        "nome_mae": {
+          "type": "string",
+          "example": "Mãe do João"
+        },
+        "nome_pai": {
+          "type": "string",
+          "example": "Pai do João"
+        }
+      }
+    },
+    "AnswerBasicoDocumentoPF": {
+      "type": "object",
+      "properties": {
+        "tipo": {
+          "description": "1 – Carteira de identidade / 2 – Carteira profissional / 3 – Passaporte / 4 – Carteira de reservista",
+          "type": "integer",
+          "enum": [
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        "numero": {
+          "type": "string",
+          "example": "000001"
+        },
+        "orgao_expedidor": {
+          "type": "string",
+          "example": "SSP"
+        },
+        "uf_expedidor": {
+          "type": "string",
+          "example": "MG"
+        }
+      }
+    },
+    "AnswerBasicoCNHPF": {
+      "type": "object",
+      "properties": {
+        "numero_registro": {
+          "type": "string",
+          "example": "0000001"
+        },
+        "categoria": {
+          "type": "string",
+          "example": "AB"
+        },
+        "data_primeira_habilitacao": {
+          "type": "string",
+          "format": "yyyy-mm-dd",
+          "example": "2000-10-10"
+        },
+        "data_validade": {
+          "type": "string",
+          "format": "yyyy-mm-dd",
+          "example": "2000-10-10"
+        }
+      }
+    },
+    "ValidateResultBasicoPF": {
+      "type": "object",
+      "properties": {
+        "nome": {
+          "type": "boolean"
+        },
+        "nome_similaridade": {
+          "description": "Percentual de similaridade",
+          "type": "number",
+          "format": "double"
+        },
+        "sexo": {
+          "type": "boolean"
+        },
+        "data_nascimento": {
+          "type": "boolean"
+        },
+        "situacao_cpf": {
+          "type": "boolean"
+        },
+        "filiacao": {
+          "$ref": "#/definitions/ResultBasicoFilicaoPF"
+        },
+        "nacionalidade": {
+          "type": "boolean"
+        },
+        "endereco": {
+          "$ref": "#/definitions/ResultPJEndereco"
+        },
+        "documento": {
+          "$ref": "#/definitions/ResultBasicoDocumentoPF"
+        },
+        "cnh": {
+          "$ref": "#/definitions/ResultBasicoCNHPF"
+        },
+        "biometria_face":{
+          "type": "object",
+         "properties": { 
+            "disponivel": {
+             "description": "Retorna true se a biometria de face estiver disponível para CPF da chave",
+             "type": "boolean"
+        },
+           "probabilidade": {
+             "description": "Retorna true se o resultado da biometria for positiva",
+              "type": "string",
+          "enum": [
+            Altíssima probabilidade,
+            Alta probabilidade,
+            Baixa probabilidade,
+            Baixíssima probabilidade
+          ]
+        },
+        "similaridade": {
+          "description": "Percentual de similaridade entre a face enviada e face encontrada no Datavalid",
+          "type": "number",
+          "format": "double"
+        }
+           
+         }
+          
+        },
+      }
+    },
+    "ResultBasicoFilicaoPF": {
+      "type": "object",
+      "properties": {
+        "nome_mae": {
+          "type": "boolean"
+        },
+        "nome_mae_similaridade": {
+          "description": "Percentual de similaridade",
+          "type": "number",
+          "format": "double"
+        },
+        "nome_pai": {
+          "type": "boolean"
+        },
+        "nome_pai_similaridade": {
+          "description": "Percentual de similaridade",
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "ResultBasicoDocumentoPF": {
+      "type": "object",
+      "properties": {
+        "tipo": {
+          "type": "boolean"
+        },
+        "numero": {
+          "type": "boolean"
+        },
+        "orgao_expedidor": {
+          "type": "boolean"
+        },
+        "uf_expedidor": {
+          "type": "boolean"
+        }
+      }
+    },
+    "ResultBasicoCNHPF": {
+      "type": "object",
+      "properties": {
+        "numero_registro": {
+          "type": "boolean"
+        },
+        "categoria": {
+          "type": "boolean"
+        },
+        "data_primeira_habilitacao": {
+          "type": "boolean"
+        },
+        "data_validade": {
+          "type": "boolean"
+        }
+      }
+    },
+    "UnprocessableEntity": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "property": {
+            "description": "Parâmetro que ocasionou o erro.",
+            "type": "string"
+          },
+          "message": {
+            "description": "Mensagem de erro",
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
